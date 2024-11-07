@@ -1004,6 +1004,7 @@ export class SubjectExecutor {
         if (this.updateSubjects.length)
             this.updateSpecialColumnsInInsertedAndUpdatedEntities(
                 this.updateSubjects,
+                false
             )
 
         // update soft-removed entity properties
@@ -1057,10 +1058,11 @@ export class SubjectExecutor {
 
     /**
      * Updates all special columns of the saving entities (create date, update date, version, etc.).
-     * Also updates nullable columns and columns with default values.
+     * Also updates nullable columns and columns with default values if flag is true
      */
     protected updateSpecialColumnsInInsertedAndUpdatedEntities(
         subjects: Subject[],
+        updateNullableColumns: boolean = true
     ): void {
         subjects.forEach((subject) => {
             if (!subject.entity) return
@@ -1083,7 +1085,7 @@ export class SubjectExecutor {
                 if (column.isDeleteDate) return
 
                 // update nullable columns
-                if (column.isNullable) {
+                if (column.isNullable && updateNullableColumns) {
                     const columnValue = column.getEntityValue(subject.entity!)
                     if (columnValue === undefined)
                         column.setEntityValue(subject.entity!, null)
